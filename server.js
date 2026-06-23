@@ -1,5 +1,9 @@
 require("dotenv").config();
 
+console.log("APP STARTED");
+console.log("JWT:", !!process.env.JWT_SECRET);
+console.log("MONGO:", !!process.env.MONGO_URI);
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
