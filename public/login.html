@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripX — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#05080f;--deep:#090e18;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--gold:#c9a84c;--teal:#4ecdc4;--coral:#e8553a;--paper:#f0ebe0;--muted:rgba(240,235,224,0.4)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font-family:'Cabinet Grotesk',sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+.orb{position:fixed;pointer-events:none;border-radius:50%;z-index:0}
+.orb-1{width:600px;height:600px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(201,168,76,.07) 0%,transparent 70%)}
+.orb-2{width:400px;height:400px;bottom:-100px;right:-100px;background:radial-gradient(circle,rgba(78,205,196,.05) 0%,transparent 70%)}
+.auth-wrapper{position:relative;z-index:1;flex:1;display:flex;align-items:stretch;min-height:100vh}
+.auth-left{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:48px;background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,transparent 60%);border-right:1px solid var(--border);max-width:480px;animation:slideInLeft .6s ease both}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.auth-logo{font-family:'Clash Display',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:3px;text-decoration:none;color:var(--paper)}
+.auth-logo span{color:var(--gold)}
+.auth-hero{margin-top:auto;padding-bottom:20px}
+.auth-hero-eyebrow{font-size:.65rem;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.auth-hero-eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--gold)}
+.auth-hero-title{font-family:'Clash Display',sans-serif;font-size:clamp(2rem,3.5vw,2.8rem);font-weight:700;letter-spacing:-1.5px;line-height:1.08;margin-bottom:16px}
+.auth-hero-sub{font-size:.9rem;color:var(--muted);line-height:1.7;max-width:320px}
+.auth-features{margin-top:36px;display:flex;flex-direction:column;gap:14px}
+.auth-feature{display:flex;align-items:center;gap:12px;font-size:.85rem;color:var(--muted)}
+.auth-feature-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.auth-left-footer{font-size:.72rem;color:rgba(240,235,224,0.2);padding-top:32px;border-top:1px solid var(--border)}
+.auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 40px;animation:fadeIn .6s .15s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.auth-card{width:100%;max-width:400px}
+.auth-card-eyebrow{font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.auth-card-title{font-family:'Clash Display',sans-serif;font-size:1.9rem;font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.auth-card-sub{font-size:.85rem;color:var(--muted);margin-bottom:36px}
+.auth-card-sub a{color:var(--gold);text-decoration:none;font-weight:600}
+.auth-card-sub a:hover{text-decoration:underline}
+.field{margin-bottom:18px}
+.field-label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px}
+.field-wrap{position:relative}
+.field-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--paper);border-radius:12px;padding:13px 16px;font-family:'Cabinet Grotesk',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s,background .2s}
+.field-input::placeholder{color:rgba(240,235,224,.25)}
+.field-input:focus{border-color:rgba(201,168,76,.5);background:rgba(255,255,255,.06)}
+.field-input.error{border-color:rgba(232,85,58,.5)}
+.field-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:4px;line-height:1;transition:color .2s}
+.field-toggle:hover{color:var(--paper)}
+.field-hint{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.field-err{font-size:.72rem;color:#ff8a70;display:none}
+.field-err.show{display:block}
+.forgot-link{font-size:.78rem;color:var(--gold);text-decoration:none;transition:opacity .2s}
+.forgot-link:hover{opacity:.7}
+.alert{border-radius:10px;padding:12px 16px;font-size:.82rem;margin-bottom:20px;display:none}
+.alert.error{background:rgba(232,85,58,.1);border:1px solid rgba(232,85,58,.25);color:#ff8a70}
+.alert.show{display:flex;align-items:center;gap:8px}
+.btn-auth{width:100%;background:var(--gold);color:var(--ink);border:none;border-radius:12px;padding:14px 20px;font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:.25s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;position:relative;overflow:hidden}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,168,76,.35)}
+.btn-auth:active{transform:translateY(0)}
+.btn-auth:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-spinner{width:16px;height:16px;border:2px solid rgba(5,8,15,.3);border-top-color:var(--ink);border-radius:50%;animation:spin .6s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-switch{text-align:center;font-size:.85rem;color:var(--muted);margin-top:20px}
+.auth-switch a{color:var(--gold);text-decoration:none;font-weight:600}
+.auth-switch a:hover{text-decoration:underline}
+@media(max-width:800px){
+  .auth-left{display:none}
+  .auth-right{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="auth-wrapper">
+  <aside class="auth-left">
+    <a href="#" class="auth-logo">Trip<span>X</span></a>
+    <div class="auth-hero">
+      <p class="auth-hero-eyebrow">Smart travel finance</p>
+      <h1 class="auth-hero-title">Every trip.<br>Every rupee.<br>Accounted.</h1>
+      <p class="auth-hero-sub">Plan budgets, track expenses, and settle up with your crew — all in one beautifully simple place.</p>
+      <div class="auth-features">
+        <div class="auth-feature"><span class="auth-feature-dot"></span>Real-time expense splitting</div>
+        <div class="auth-feature"><span class="auth-feature-dot"></span>Smart settlement suggestions</div>
+        <div class="auth-feature"><span class="auth-feature-dot"></span>Budget tracking with alerts</div>
+        <div class="auth-feature"><span class="auth-feature-dot"></span>Trip history &amp; insights</div>
+      </div>
+    </div>
+    <div class="auth-left-footer">© 2024 TripX. Built for explorers.</div>
+  </aside>
+
+  <main class="auth-right">
+    <div class="auth-card">
+      <p class="auth-card-eyebrow">Welcome back</p>
+      <h2 class="auth-card-title">Sign in to TripX</h2>
+      <p class="auth-card-sub">New here? <a href="register.html">Create a free account →</a></p>
+
+      <div class="alert error" id="alertBox">
+        <span>⚠</span>
+        <span id="alertMsg"></span>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="email">Email Address</label>
+        <div class="field-wrap">
+          <input class="field-input" type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field-hint">
+          <span class="field-err" id="emailErr">Enter a valid email address.</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <div class="field-wrap">
+          <input class="field-input" type="password" id="password" placeholder="Your password" autocomplete="current-password">
+          <button class="field-toggle" type="button" onclick="togglePwd('password','eyeIcon')" id="eyeIcon">👁</button>
+        </div>
+        <div class="field-hint">
+          <span class="field-err" id="passErr">Password is required.</span>
+          <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+        </div>
+      </div>
+
+      <button class="btn-auth" id="loginBtn" onclick="handleLogin()">
+        <div class="btn-spinner" id="spinner"></div>
+        <span id="btnText">Sign In</span>
+      </button>
+
+      <div class="auth-switch">
+        Don't have an account? <a href="register.html">Sign up for free</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// FIX: this was hardcoded to "http://localhost:3000", which only works when
+// you're running the server on your own machine. server.js serves this exact
+// file as a static asset from the same Express app that exposes the API, so
+// the API always lives at the page's own origin — locally AND once deployed
+// to a host like Render/Railway. window.location.origin resolves correctly
+// in both cases automatically.
+const API = window.location.origin;
+
+// Redirect if already logged in — run before page paints to avoid flash
+if (localStorage.getItem("token")) {
+  window.location.replace("index.html");
+}
+
+function togglePwd(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
+  input.type  = input.type === "password" ? "text" : "password";
+  icon.textContent = input.type === "password" ? "👁" : "🙈";
+}
+
+function showAlert(msg) {
+  const box = document.getElementById("alertBox");
+  document.getElementById("alertMsg").textContent = msg;
+  box.className = "alert error show";
+}
+
+function hideAlert() {
+  document.getElementById("alertBox").className = "alert error";
+}
+
+function setLoading(loading) {
+  const btn = document.getElementById("loginBtn");
+  document.getElementById("spinner").style.display  = loading ? "block" : "none";
+  document.getElementById("btnText").textContent    = loading ? "Signing in…" : "Sign In";
+  btn.disabled = loading;
+}
+
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function handleLogin() {
+  hideAlert();
+  const email    = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  let valid = true;
+
+  if (!validateEmail(email)) {
+    document.getElementById("email").classList.add("error");
+    document.getElementById("emailErr").classList.add("show");
+    valid = false;
+  } else {
+    document.getElementById("email").classList.remove("error");
+    document.getElementById("emailErr").classList.remove("show");
+  }
+
+  if (!password) {
+    document.getElementById("password").classList.add("error");
+    document.getElementById("passErr").classList.add("show");
+    valid = false;
+  } else {
+    document.getElementById("password").classList.remove("error");
+    document.getElementById("passErr").classList.remove("show");
+  }
+
+  if (!valid) return;
+
+  setLoading(true);
+  try {
+    const res  = await fetch(`${API}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Login failed");
+
+    localStorage.setItem("token",    data.token);
+    localStorage.setItem("userName", data.userName);
+    localStorage.setItem("userId",   data.userId);
+
+    window.location.href = "index.html";
+  } catch (err) {
+    showAlert(err.message);
+    setLoading(false);
+  }
+}
+
+// Enter key submits
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter") handleLogin();
+});
+
+// Clear error styles on input
+["email", "password"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    document.getElementById(id).classList.remove("error");
+    document.getElementById(id === "email" ? "emailErr" : "passErr").classList.remove("show");
+  });
+});
+</script>
+</body>
+</html>

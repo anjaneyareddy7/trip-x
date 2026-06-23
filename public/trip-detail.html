@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripX — Trip Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#05080f;--deep:#090e18;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--gold:#c9a84c;--teal:#4ecdc4;--coral:#e8553a;--paper:#f0ebe0;--muted:rgba(240,235,224,0.4)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font-family:'Cabinet Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+
+/* FIX: toastIn keyframe was missing — toast animation would silently fail */
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:100;background:rgba(5,8,15,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 48px;height:64px;display:flex;align-items:center;gap:16px}
+.logo{font-family:'Clash Display',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:3px;color:var(--paper);text-decoration:none}
+.logo span{color:var(--gold)}
+.back-btn{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:7px 14px;font-family:'Cabinet Grotesk',sans-serif;font-size:.82rem;cursor:pointer;text-decoration:none;transition:.2s;margin-left:auto}
+.back-btn:hover{color:var(--paper);background:rgba(255,255,255,.08)}
+
+/* LAYOUT */
+.page-content{max-width:1200px;margin:0 auto;padding:40px 48px 80px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:900px){.page-content{grid-template-columns:1fr;padding:24px 20px 60px}.navbar{padding:0 20px}}
+
+/* TRIP HEADER */
+.trip-header{grid-column:1/-1;padding-bottom:28px;border-bottom:1px solid var(--border)}
+#tripHeader h1{font-family:'Clash Display',sans-serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:700;letter-spacing:-1px;margin-bottom:6px}
+#tripHeader p{color:var(--muted);font-size:.9rem}
+
+/* SECTION CARDS */
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.section-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-title{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:600;letter-spacing:-.2px}
+.section-body{padding:20px 24px}
+.btn-add{background:var(--gold);color:var(--ink);border:none;border-radius:8px;padding:7px 14px;font-family:'Cabinet Grotesk',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s}
+.btn-add:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
+/* FULL WIDTH */
+.full-width{grid-column:1/-1}
+
+/* TOAST */
+#toastContainer{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">Trip<span>X</span></a>
+  <a href="index.html" class="back-btn">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    Back to Trips
+  </a>
+</nav>
+
+<div class="page-content">
+
+  <!-- TRIP TITLE -->
+  <div class="trip-header">
+    <div id="tripHeader"><p style="opacity:.4">Loading…</p></div>
+  </div>
+
+  <!-- OVERVIEW STATS — full width -->
+  <div class="section-card full-width">
+    <div class="section-header">
+      <span class="section-title">📊 Trip Overview</span>
+    </div>
+    <!-- FIX: id="tripStats" is on the section-body so renderTripStats() renders inside the card -->
+    <div class="section-body" id="tripStats"></div>
+  </div>
+
+  <!-- MEMBERS -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">👥 Members</span>
+      <button class="btn-add" onclick="addMember()">+ Add Member</button>
+    </div>
+    <div class="section-body" id="membersList"><p style="opacity:.4">Loading…</p></div>
+  </div>
+
+  <!-- EXPENSES -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">💸 Expenses</span>
+      <button class="btn-add" onclick="addExpense()">+ Add Expense</button>
+    </div>
+    <div class="section-body" id="expensesList"><p style="opacity:.4">Loading…</p></div>
+  </div>
+
+  <!-- BALANCES -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">⚖️ Balances</span>
+    </div>
+    <div class="section-body" id="balancesList"></div>
+  </div>
+
+  <!-- SETTLEMENTS -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">🤝 Settlements</span>
+    </div>
+    <div class="section-body" id="settleList"></div>
+  </div>
+
+</div>
+
+<div id="toastContainer"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

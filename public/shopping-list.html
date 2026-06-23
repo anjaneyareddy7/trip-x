@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Shopping List</title>
+    <style>
+        body{font-family:sans-serif;max-width:480px;margin:40px auto;padding:0 16px}
+        .row{display:flex;gap:8px;margin-bottom:16px}
+        #item{flex:1;padding:8px;font-size:1rem}
+        button{padding:8px 14px;font-size:1rem;cursor:pointer}
+        #list{padding-left:24px}
+        #list li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #eee}
+        #list li button{background:none;border:none;color:#c0392b;font-size:.9rem;cursor:pointer}
+        #emptyMsg{color:#888;text-align:center}
+    </style>
+</head>
+<body>
+    <h1 align="center">My Shopping List</h1>
+
+    <!-- FIX: wrapped input+button so Enter key can submit too -->
+    <div class="row">
+        <input id="item" type="text" placeholder="e.g., Milk" autocomplete="off">
+        <button onclick="addItem()">Add Item</button>
+    </div>
+    <ol id="list"></ol>
+    <p id="emptyMsg">Your list is empty. Add something above!</p>
+
+    <script>
+        /*
+         * FIX SUMMARY (the original file would not even run):
+         * 1. `function delete(btn)` used "delete", a reserved JavaScript
+         *    keyword — this is a SyntaxError that broke parsing of the
+         *    ENTIRE <script> block, so neither function (including
+         *    additem()) ever worked, even though "Add Item" looked wired up.
+         *    Renamed to deleteItem(btn).
+         * 2. additem() read the <input> ELEMENT into `name`, then checked
+         *    `if (name == null)` — that's always false (the element always
+         *    exists), so empty submissions were never actually blocked.
+         *    Now reads and trims `.value` and exits if it's blank.
+         * 3. The original never set any text on the created <li>, never
+         *    appended it to the list, and never cleared the input — so
+         *    even with the syntax fixed, nothing would visibly happen.
+         * 4. Used textContent (not innerHTML) when inserting the item name,
+         *    so typed HTML/script can't inject into the page (XSS-safe).
+         * 5. Added a delete button per item and Enter-key support.
+         */
+        function addItem() {
+            const input = document.getElementById("item");
+            const name = input.value.trim();
+
+            if (!name) {
+                input.focus();
+                return;
+            }
+
+            const li = document.createElement("li");
+
+            const span = document.createElement("span");
+            span.textContent = name; // textContent escapes HTML automatically
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "✕ Remove";
+            delBtn.onclick = function () { deleteItem(delBtn); };
+
+            li.appendChild(span);
+            li.appendChild(delBtn);
+            document.getElementById("list").appendChild(li);
+
+            input.value = "";
+            input.focus();
+            updateEmptyMsg();
+        }
+
+        function deleteItem(btn) {
+            const li = btn.closest("li");
+            if (li) li.remove();
+            updateEmptyMsg();
+        }
+
+        function updateEmptyMsg() {
+            const list = document.getElementById("list");
+            document.getElementById("emptyMsg").style.display =
+                list.children.length ? "none" : "block";
+        }
+
+        // Pressing Enter in the input adds the item too
+        document.getElementById("item").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") addItem();
+        });
+
+        updateEmptyMsg();
+    </script>
+</body>
+</html>
